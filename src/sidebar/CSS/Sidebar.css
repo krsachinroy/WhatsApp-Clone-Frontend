@@ -45,6 +45,10 @@
 }
 .sidebar_chat{
     flex: 1;
-    background-color:white;
+    background-color:#f6f6f6;
     overflow:scroll;
+}
+.chatButton{
+    width:100%;
+    border: none;
 }

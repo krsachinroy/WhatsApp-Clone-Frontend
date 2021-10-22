@@ -1,11 +1,11 @@
 import React from 'react'
 import './CSS/Chat.css'
-function ChatMessage({ message }) {
+import { format } from "timeago.js";
+function ChatMessage({ message, data }) {
     return (
         <p className="chat_message">
-            <span className="chat_name">{message.name}</span>
             {message.message}
-            <span className="chat_timestamp">{message.timestamp}</span>
+            <span className="chat_timestamp">{format(message.createdAt)}</span>
         </p>
     )
 }

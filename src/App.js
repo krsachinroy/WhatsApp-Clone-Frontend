@@ -1,42 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import Pusher from 'pusher-js';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Sidebar from './sidebar/Side-bar';
 import Chat from './Chat/Chat';
-import axios from './axios';
+//import axios from './axios';
+import Login from './Login/Login';
+import Cookies from 'js-cookie'
+import {io} from 'socket.io-client'
+
 
 function App() {
-  const [messages, setMessages] = useState([]);
+
+  const [login, setLogin] = useState(false);
+  const [convDetail, setconvDetails] = useState(null);
+  const [chatBool, setChatBool] = useState(false)
+  const [socket, setSocket] = useState(null);
+
+  const setData = () => {
+    setLogin(true);
+  }
+  const getConvDetails = (data) => {
+    setChatBool(true);
+    setconvDetails(data)
+  }
   useEffect(() => {
-    axios.get('/messages/sync')
-      .then(response => {
-        setMessages(response.data)
-      })
-  }, []);
+    let user;
+    setSocket(io("ws://localhost:8008"));
+    if(login)
+    user = JSON.parse(Cookies.get('User'));
+    socket?.emit("addUser",user._id);
+    if (Cookies.get('User')) {
+      setLogin(true);
+    }
+  },[])
 
-  useEffect(() => {
-    var pusher = new Pusher('7a91eac3b74c2aa64953', {
-      cluster: 'mt1'
-    });
-
-    var channel = pusher.subscribe('messages');
-    channel.bind('inserted', function (newMessage) {
-      setMessages([...messages, newMessage])
-    })
-
-    return () => {
-      channel.unbind_all();
-      channel.unsubscribe();
-    };
-  }, [messages])
-
-  console.log(messages);
   return (
     <div className="App">
-      <div className="app_body">
-        <Sidebar />
-        <Chat messages={messages} />
-      </div>
+      {login ? <div className="app_body">
+        <Sidebar setConvId={getConvDetails} />
+        {chatBool ? <Chat convDetails={convDetail} socket={socket} /> : <span className="chatCon">Select person to chat</span>}
+      </div> : <div className="app_body">
+          <Login setData={setData} />
+        </div>}
     </div>
   );
 }
