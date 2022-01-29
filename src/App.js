@@ -36,7 +36,7 @@ function App() {
   return (
     <div className="App">
       {login ? <div className="app_body">
-        <Sidebar setConvId={getConvDetails} />
+        <Sidebar setConvId={getConvDetails} socket={socket}/>
         {chatBool ? <Chat convDetails={convDetail} socket={socket} /> : <span className="chatCon">Select person to chat</span>}
       </div> : <div className="app_body">
           <Login setData={setData} />

@@ -9,7 +9,7 @@ import ChatReciver from './ChatReciver';
 import ChatSender from './ChatSender';
 import axios from '../axios';
 import Cookies from 'js-cookie';
-import {io} from 'socket.io-client';
+
 
 
 function Chat({ convDetails,socket }) {
@@ -48,6 +48,7 @@ function Chat({ convDetails,socket }) {
        //setSocket(io("ws://localhost:8008"));
        socket?.emit('addUser',user._id);
         socket?.on("getMessage", (data) => {
+            console.log(data)
             setArrivalMessage({
               sender: data.senderId,
               message: data.text,
@@ -74,7 +75,7 @@ function Chat({ convDetails,socket }) {
             })
         }
         getConvMessage();
-    }, [convDetails._id]);
+    }, [convDetails._id,user._id]);
     
     useEffect(() => {
         let reciverId = convDetails.members.filter(m => m !== user._id)
@@ -87,7 +88,7 @@ function Chat({ convDetails,socket }) {
             })
         }
         getReciverDetails();
-    }, [convDetails._id])
+    }, [convDetails._id, convDetails.members, user._id])
     return (
         <div className="Chat">
             <div className="chat_header">

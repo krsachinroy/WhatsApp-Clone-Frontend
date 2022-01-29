@@ -29,11 +29,12 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2, 4, 3),
     },
 }));
-function Sidebar({ setConvId }) {
+function Sidebar({ setConvId, socket }) {
 
     const classes = useStyles();
     const [open, setOpen] = useState(false);
     const [contactData, setContactData] = useState(null);
+    const [arrivalContact, setArrivalContact] = useState(null);
     const user = JSON.parse(Cookies.get('User'));
     const handleOpen = () => {
         setOpen(true);
@@ -63,15 +64,34 @@ function Sidebar({ setConvId }) {
             senderId: user._id,
 
         }).then((res) => {
-            console.log(res.data);
+            setContactData((prev)=>[...prev,res.data]);
         }).catch((err) => {
             alert(err.message);
         })
+        await axios.get(`/addContact/getUserId/${addData.givenPhone}`).then((res) => {
+            socket?.emit("addContact",{
+                reciverId: res.data[0]._id,
+                senderId: user._id,
+            });  
+        })
         handleClose();
     }
+    useEffect(() =>{
+        socket?.emit('addUser',user._id);
+        socket.on("getContact", (data) => {
+            console.log(data)
+            setArrivalContact(data);
+        })
+    },[]);
+    useEffect(() =>{
+        arrivalContact && setContactData((prev)=> [...prev,arrivalContact]);
+    },[arrivalContact]);
+
     const handleIndividualChat = (data) => {
         setConvId(data);
     }
+    console.log(arrivalContact)
+    console.log(contactData);
     return (
         <div className="Sidebar">
             <div className="sidebar_header">
